@@ -64,18 +64,14 @@ def profile():
 
 @app.route('/dashboard')
 def dashboard():
-    token_info = session.get('token_info')
-    if not token_info:
-        return redirect(url_for('login'))  # Redirect if not logged in
+    sp = get_spotify_auth()  # Ensure you are getting an authenticated session
+    user_data = sp.current_user()
 
-    headers = {"Authorization": f"Bearer {token_info['access_token']}"}
-    user_data = requests.get("https://api.spotify.com/v1/me", headers=headers).json()
+    # Handle missing 'images' field
+    images = user_data.get('images', [])
+    profile_image = images[0]['url'] if images else url_for('static', filename='profile.png')
 
-    username = user_data.get('display_name', 'Spotify User')  # Default if missing
-    profile_image = user_data.get('images', [{}])[0].get('url', url_for('static', filename='profile.png'))  
-
-    return render_template('dashboard.html', username=username, profile_image=profile_image)
-
+    return render_template('dashboard.html', profile_image=profile_image)
 
 @app.route('/playlist-to-personality')
 def playlist_to_personality():
