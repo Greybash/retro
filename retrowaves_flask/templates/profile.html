@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #0f3460;
+            color: white;
+        }
+        .profile-container {
+            margin-top: 50px;
+        }
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #1db954;
+            box-shadow: 0 0 10px #1db954;
+        }
+        .username {
+            font-size: 1.5em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <img src="{{ profile_image }}" alt="Profile Picture" class="profile-image">
+        <p class="username">{{ username }}</p>
+    </div>
+</body>
+</html>
+

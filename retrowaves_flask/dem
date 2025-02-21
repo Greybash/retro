@@ -1,0 +1,29 @@
+@app.route('/analyze-playlist', methods=['GET', 'POST'])  # ✅ Allow both methods
+def analyze_playlist_personality():
+    token_info = session.get('token_info')
+    if not token_info:
+        return redirect(url_for('login'))  # Redirect if not logged in
+
+    sp = spotipy.Spotify(auth=token_info['access_token'])  # ✅ Initialize Spotify client
+
+    if request.method == 'POST':
+        playlist_id = request.form.get('playlist_id')
+        if not playlist_id:
+            return render_template('select_playlist.html', error="Please select a playlist.")
+
+        # ✅ Fetch playlist tracks
+        try:
+            results = sp.playlist_tracks(playlist_id)
+            tracks = [{'id': t['track']['id'], 'name': t['track']['name']} for t in results.get('items', [])]
+            print(f"🎵 Found {len(tracks)} tracks in playlist")  # Debugging Output
+        except Exception as e:
+            print(f"❌ Error fetching playlist tracks: {e}")
+            return render_template('select_playlist.html', error="Failed to fetch playlist tracks.")
+
+        # ✅ Placeholder for personality analysis
+        personality_df = "Personality Data"  # Replace with real analysis
+        chart_url = '/static/chart.png'  # Replace with dynamic chart generation
+
+        return render_template('analyze_playlist.html', personality_df=personality_df, chart_url=chart_url)
+
+    return render_template('select_playlist.html')

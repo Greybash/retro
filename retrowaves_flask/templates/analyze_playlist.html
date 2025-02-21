@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Playlist</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #f8f8f8;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 10px #1db954;
+        }
+        select, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 1em;
+        }
+        .playlist-container {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .playlist-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 5px #1db954;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 255, 0, 0.2);
+            border-radius: 10px;
+        }
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #1db954;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Analyze Your Playlist</h2>
+
+    <form method="POST" action="{{ url_for('analyze_playlist_personality') }}">
+        <label for="playlist_id">Select a Playlist:</label>
+        <select name="playlist_id" id="playlist_id">
+            <option value="" selected disabled>Choose a playlist</option>
+            {% if playlists %}
+                {% for playlist in playlists %}
+                    <option value="{{ playlist.id }}">{{ playlist.name }}</option>
+                {% endfor %}
+            {% else %}
+                <option value="" disabled>No playlists found</option>
+            {% endif %}
+        </select>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if personality_df %}
+        <div class="result-container">
+            <h2>Personality Analysis Result</h2>
+            {{ personality_df | safe }}
+            {% if chart_url %}
+                <h3>Personality Traits Chart</h3>
+                <img src="{{ chart_url }}" alt="Personality Chart">
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

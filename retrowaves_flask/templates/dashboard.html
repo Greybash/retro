@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrowaves Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #f8f8f8;
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end; /* Moves the profile icon to the right */
+            align-items: center;
+            padding: 10px 20px;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        .profile-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+        }
+        h1 {
+            font-size: 2em;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff1493;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 80px;
+        }
+        .option {
+            background-color: #1db954;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1em;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 0 10px #1db954;
+            display: inline-block;
+        }
+        .option:hover {
+            background-color: #17a74b;
+            box-shadow: 0 0 15px #17a74b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="username">{{ username }}</span>
+        <img src="{{ profile_image }}" alt="Profile" class="profile-icon">
+    </div>
+    <div class="container">
+        <h1>RETROWAVES</h1>
+        <p>Explore your music with Retrowave Vibes</p>
+        <div class="options">
+            <a class="option" href="#">🎵 Song Recommendation</a>
+            <a class="option" href="#">🔍 Song Finder</a>
+            <a class="option" href="#">📊 Music Analysis</a>
+            <a class="option" href="{{ url_for('playlist_to_personality') }}">🎭 Playlist to Personality</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist to Personality</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #f8f8f8;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            font-size: 2em;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff1493;
+        }
+        .button {
+            background-color: #1db954;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1em;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 0 10px #1db954;
+        }
+        .button:hover {
+            background-color: #17a74b;
+            box-shadow: 0 0 15px #17a74b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Playlist to Personality</h1>
+        <a class="button" href="{{ url_for('analyze_playlist_personality') }}">Analyze a Specific Playlist</a>
+        <a class="button" href="#">Analyze Entire Spotify Account</a>
+    </div>
+</body>
+</html>
