@@ -49,26 +49,22 @@ def login():
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
-@app.route('/callback')
+@app.route("/callback")
 def callback():
-    """Handle Spotify OAuth callback and generate a new token per user."""
-    session.clear()  # Ensure no old user data persists
+    code = request.args.get("code")
 
-    code = request.args.get('code')
     if not code:
-        return "Authorization failed. Please try again.", 400
+        return "Error: Missing authorization code", 400
 
     try:
         token_info = sp_oauth.get_access_token(code)
-        spotify_client = spotipy.Spotify(auth=token_info['access_token'])
-
-        # Fetch user profile (dynamic for each user)
-        user_data = spotify_client.current_user()
-
-        return render_template("dashboard.html", user=user_data)
-
+        print("TOKEN INFO:", token_info)  # Log the response
     except Exception as e:
+        print("ERROR FETCHING TOKEN:", str(e))
         return f"Error retrieving token: {str(e)}", 500
+
+    session["token_info"] = token_info
+    return redirect(url_for("profile"))
 
 
 @app.route('/profile')
