@@ -22,7 +22,7 @@ app.secret_key = "e3f1c2a5d5e1f2e4c9b6a4c8d3f0b7e6a8d5c3b9f4e2a1c7d6f0b8e5a4c2d3
 sp_oauth = SpotifyOAuth(
     client_id=os.getenv("CLIENT_ID"),
     client_secret=os.getenv("CLIENT_SECRET"),
-    redirect_uri=os.getenv("REDIRECT_URI"),
+    redirect_uri="https://your-app-name.up.railway.app/callback",
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
 
