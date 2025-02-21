@@ -54,7 +54,8 @@ def home():
 @app.route('/login')
 def login():
     auth_url = sp_oauth.get_authorize_url()
-    return redirect(auth_url)
+    return redirect(auth_url)  # Redirect user to Spotify login
+
 
 @app.route("/callback")
 def callback():
