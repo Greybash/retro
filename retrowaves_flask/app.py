@@ -26,6 +26,19 @@ sp_oauth = SpotifyOAuth(
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
 
+
+
+def get_spotify_auth():
+    """Authenticate and return a Spotify client session."""
+    token_info = sp_oauth.get_cached_token()  # Check if a token exists
+    if not token_info:  # If no token, prompt for authorization
+        auth_url = sp_oauth.get_authorize_url()
+        return f"Please authorize: <a href='{auth_url}'>Login with Spotify</a>"
+    
+    access_token = token_info['access_token']
+    sp = spotipy.Spotify(auth=access_token)
+    return sp
+
 @app.route('/')
 def home():
     return render_template('home.html')
