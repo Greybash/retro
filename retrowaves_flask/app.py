@@ -28,22 +28,25 @@ sp_oauth = SpotifyOAuth(
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
 
+import json  # Needed for string-to-dict conversion
+
 def get_spotify_auth():
     token_info = session.get("token_info")
-    
-    print("Token Info:", token_info)  # Debugging line
+
+    print("Token Info:", token_info)  # Debugging
 
     if not token_info:
-        return None
+        return None  # No token available, user must log in
 
     if isinstance(token_info, str):  # Convert to dict if stored as a string
         token_info = json.loads(token_info)
 
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
-        session["token_info"] = token_info
+        session["token_info"] = token_info  # Save the refreshed token
 
-    return token_info
+    # ✅ Return an authenticated Spotipy client
+    return spotipy.Spotify(auth=token_info["access_token"])
 
 
 @app.route('/callback')
@@ -98,14 +101,24 @@ def profile():
 
 @app.route('/dashboard')
 def dashboard():
-    sp = get_spotify_auth()  # Ensure you are getting an authenticated session
-    user_data = sp.current_user()
+    sp = get_spotify_auth()  # Get authenticated Spotipy client
 
-    # Handle missing 'images' field
-    images = user_data.get('images', [])
-    profile_image = images[0]['url'] if images else url_for('static', filename='profile.png')
+    if not sp:
+        return redirect(url_for("login"))  # Redirect if authentication fails
 
-    return render_template('dashboard.html', profile_image=profile_image)
+    try:
+        user_data = sp.current_user()  # ✅ This will now work!
+        
+        # Handle missing 'images' field
+        images = user_data.get('images', [])
+        profile_image = images[0]['url'] if images else url_for('static', filename='profile.png')
+
+        return render_template('dashboard.html', profile_image=profile_image)
+
+    except Exception as e:
+        print(f"Error fetching user data: {e}")
+        return "An error occurred while fetching user data.", 500
+
 
 @app.route('/playlist-to-personality')
 def playlist_to_personality():
