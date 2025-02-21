@@ -6,3 +6,5 @@ spotipy
 python-dotenv
 gunicorn
 Flask-Session
+flask-caching
+
