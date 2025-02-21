@@ -33,19 +33,18 @@ import json  # Needed for string-to-dict conversion
 def get_spotify_auth():
     token_info = session.get("token_info")
 
-    print("Token Info:", token_info)  # Debugging
-
     if not token_info:
-        return None  # No token available, user must log in
+        return None
 
-    if isinstance(token_info, str):  # Convert to dict if stored as a string
+    if isinstance(token_info, str):
         token_info = json.loads(token_info)
 
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
-        session["token_info"] = token_info  # Save the refreshed token
+        session["token_info"] = token_info
 
-    # ✅ Return an authenticated Spotipy client
+    print("🔹 Refreshed Token:", token_info)  # Debugging line
+
     return spotipy.Spotify(auth=token_info["access_token"])
 
 
