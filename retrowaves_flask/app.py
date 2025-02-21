@@ -21,7 +21,7 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 sp_oauth = SpotifyOAuth(
     client_id=os.getenv("CLIENT_ID"),
     client_secret=os.getenv("CLIENT_SECRET"),
-    redirect_uri=os.getenv("REDIRECT_URI"),
+    redirect_uri="https://retro-production-7ee2.up.railway.app/callback",
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
 
