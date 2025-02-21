@@ -24,11 +24,18 @@ sp_oauth = SpotifyOAuth(
     redirect_uri="https://retro-production-7ee2.up.railway.app/callback",
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
-
 def get_spotify_auth():
-    """Always get a new Spotify access token."""
-    auth_url = sp_oauth.get_authorize_url()
-    return redirect(auth_url)
+    """Always fetch a new access token for every user session."""
+    code = request.args.get('code')
+    if not code:
+        return redirect(sp_oauth.get_authorize_url())
+
+    # Get a new access token every time
+    token_info = sp_oauth.get_access_token(code)
+
+    # Return a new Spotify client instance for this session
+    return spotipy.Spotify(auth=token_info['access_token'])
+
 
 
 @app.route('/')
@@ -40,15 +47,26 @@ def login():
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 @app.route("/callback")
-def spotify_callback():
-    """Handle Spotify OAuth callback and get new tokens."""
-    code = request.args.get("code")
-    if not code:
-        return "Error: Authorization code not provided."
+@app.route('/callback')
+def callback():
+    """Handle Spotify OAuth callback and generate a new token per user."""
+    session.clear()  # Ensure no old user data persists
 
-    token_info = sp_oauth.get_access_token(code)
-    session["token_info"] = token_info  # Store new token in session
-    return redirect(url_for("home"))  # Redirect to your app's main page
+    code = request.args.get('code')
+    if not code:
+        return "Authorization failed. Please try again.", 400
+
+    try:
+        token_info = sp_oauth.get_access_token(code)
+        spotify_client = spotipy.Spotify(auth=token_info['access_token'])
+
+        # Fetch user profile (dynamic for each user)
+        user_data = spotify_client.current_user()
+
+        return render_template("dashboard.html", user=user_data)
+
+    except Exception as e:
+        return f"Error retrieving token: {str(e)}", 500
 
 
 @app.route('/profile')
