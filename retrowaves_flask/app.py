@@ -35,13 +35,18 @@ def login():
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
-@app.route('/callback')
+@app.route("/callback")
 def callback():
-    session.clear()
-    code = request.args.get('code')
+    code = request.args.get("code")
+    if not code:
+        return "Error: No authorization code received", 400
+
     token_info = sp_oauth.get_access_token(code)
-    session['token_info'] = token_info
-    return redirect(url_for('dashboard'))
+    
+    # Save token in session
+    session["token_info"] = token_info
+    return redirect(url_for("dashboard"))  # Redirect to your main app page
+
 @app.route('/profile')
 def profile():
     token_info = session.get('token_info', {})
