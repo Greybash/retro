@@ -25,18 +25,18 @@ sp_oauth = SpotifyOAuth(
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
 def get_spotify_auth():
-    """Fetch or refresh the Spotify access token and return a Spotify client."""
     token_info = session.get("token_info", None)
 
     if not token_info:
-        return redirect(url_for('login'))  # Ensure user re-authenticates
+        return redirect(url_for('login'))
 
-    # Check if token has expired and refresh if necessary
+    # Refresh token if expired
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
-        session['token_info'] = token_info  # Update session with new token
+        session['token_info'] = token_info  # Save refreshed token
 
     return spotipy.Spotify(auth=token_info['access_token'])
+
 
 
 
