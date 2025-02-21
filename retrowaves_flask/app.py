@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, session, url_for
 import os
 import requests
@@ -6,29 +7,19 @@ import matplotlib.pyplot as plt
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
-from config import Config  # Import Config class
-from flask import Flask, session
+from config import Config
 from flask_session import Session
-import os
-
-from flask import Flask, session
-from flask_session import Session
-import os
-
-
-
 
 load_dotenv()
+
 app = Flask(__name__)
-app.config.from_object(Config)  # Load configuration from config.py
+app.config.from_object(Config)
 app.secret_key = "e3f1c2a5d5e1f2e4c9b6a4c8d3f0b7e6a8d5c3b9f4e2a1c7d6f0b8e5a4c2d3f1"
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_USE_SIGNER"] = True# Store session on the server
-Session(app)
+app.config["SESSION_USE_SIGNER"] = True
 
-
-
+Session(app)  # Moved after app configuration
 
 sp_oauth = SpotifyOAuth(
     client_id=os.getenv("CLIENT_ID"),
@@ -37,25 +28,25 @@ sp_oauth = SpotifyOAuth(
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
 
-
-
-from flask import session, redirect, request
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-
 def get_spotify_auth():
     """Authenticate and return a Spotify client session for the current user."""
     if "token_info" not in session:
-        return redirect("/login")  # Redirect to Spotify login if no token is found
+        return redirect("/login")
     
     token_info = session["token_info"]
-    
-    # Check if token is expired and refresh if needed
+
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
-        session["token_info"] = token_info  # Update session with new token
+        session["token_info"] = token_info
 
     return spotipy.Spotify(auth=token_info["access_token"])
+
+@app.route('/callback')
+def callback():
+    code = request.args.get("code")
+    token_info = sp_oauth.get_access_token(code, as_dict=False)  # Updated method
+    session["token_info"] = token_info
+    return redirect(url_for("dashboard"))
 
 
 @app.route('/')
@@ -67,15 +58,6 @@ def login():
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)  # Redirect user to Spotify login
 
-
-@app.route('/callback')
-def callback():
-    code = request.args.get("code")
-    token_info = sp_oauth.get_access_token(code)
-    
-    session["token_info"] = token_info  # Store token in session
-    return redirect("/dashboard")  # Redirect to the dashboard
-  # Redirect to your main app page
 
 @app.route('/profile')
 def profile():
