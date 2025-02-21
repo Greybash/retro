@@ -25,15 +25,17 @@ sp_oauth = SpotifyOAuth(
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
 def get_spotify_auth():
-    """Always fetch a new access token for every user session."""
-    code = request.args.get('code')
-    if not code:
-        return redirect(sp_oauth.get_authorize_url())
+    """Fetch or refresh the Spotify access token and return a Spotify client."""
+    token_info = session.get("token_info", None)
 
-    # Get a new access token every time
-    token_info = sp_oauth.get_access_token(code)
+    if not token_info:
+        return redirect(url_for('login'))  # Ensure user re-authenticates
 
-    # Return a new Spotify client instance for this session
+    # Check if token has expired and refresh if necessary
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+        session['token_info'] = token_info  # Update session with new token
+
     return spotipy.Spotify(auth=token_info['access_token'])
 
 
@@ -188,15 +190,19 @@ def analyze_playlist_personality():
     playlists = get_user_playlists()
     return render_template('analyze_playlist.html', playlists=playlists)
 
-@cache.memoize(timeout=600)
+@cache.memoize(timeout=60)
 def get_user_playlists():
-    """Fetch user's playlists with caching."""
+    """Fetch user's playlists dynamically with caching."""
     sp = get_spotify_auth()
-    if not sp:
+    if not isinstance(sp, spotipy.Spotify):  # Ensure `sp` is a valid client
         return []
 
-    playlists = sp.current_user_playlists().get('items', [])
-    return [{'name': p['name'], 'id': p['id']} for p in playlists]
+    try:
+        playlists = sp.current_user_playlists().get('items', [])
+        return [{'name': p['name'], 'id': p['id']} for p in playlists]
+    except Exception as e:
+        print(f"Error fetching playlists: {e}")
+        return []
 
 @cache.memoize(timeout=600)
 def get_playlist_tracks_with_genres(playlist_id):
