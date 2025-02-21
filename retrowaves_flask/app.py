@@ -74,14 +74,20 @@ def callback():
 @app.route('/profile')
 def profile():
     sp = get_spotify_auth()
-    if not sp:
+    
+    # Check if `sp` is a valid Spotify client
+    if not isinstance(sp, spotipy.Spotify):
         return redirect(url_for('login'))
 
-    user_data = sp.me()
-    username = user_data.get('display_name', 'Unknown User')
-    profile_image = user_data.get('images', [{}])[0].get('url', url_for('static', filename='profile.png'))
+    try:
+        user_data = sp.me()  # Fetch user profile safely
+        username = user_data.get('display_name', 'Unknown User')
+        profile_image = user_data.get('images', [{}])[0].get('url', url_for('static', filename='profile.png'))
+        
+        return render_template('profile.html', username=username, profile_image=profile_image)
+    except Exception as e:
+        return f"Error fetching profile: {str(e)}", 500
 
-    return render_template('profile.html', username=username, profile_image=profile_image)
 
 @app.route('/dashboard')
 def dashboard():
