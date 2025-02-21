@@ -16,7 +16,7 @@ from flask_session import Session
 import os
 
 
-Session(app)
+
 
 load_dotenv()
 app = Flask(__name__)
