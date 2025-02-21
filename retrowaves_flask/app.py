@@ -22,7 +22,7 @@ sp_oauth = SpotifyOAuth(
     client_id=os.getenv("CLIENT_ID"),
     client_secret=os.getenv("CLIENT_SECRET"),
     redirect_uri="https://retro-production-7ee2.up.railway.app/callback",
-    scope=os.getenv("SPOTIFY_SCOPE"),
+    scope="user-read-private user-read-email user-library-modify user-library-read streaming app-remote-control playlist-read-collaborative playlist-modify-private playlist-modify-public user-top-read",
 )
 def get_spotify_auth():
     token_info = session.get("token_info", None)
