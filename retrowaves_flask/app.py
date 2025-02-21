@@ -100,23 +100,14 @@ def profile():
 
 @app.route('/dashboard')
 def dashboard():
-    sp = get_spotify_auth()  # Get authenticated Spotipy client
+    sp = get_spotify_auth()
+    
+    if isinstance(sp, str):  # If the function returns a login link
+        return sp  # Redirect user to authorize Spotify access
+    
+    user_info = sp.current_user()  # Fetch user data
+    return f"Logged in as: {user_info['display_name']}"
 
-    if not sp:
-        return redirect(url_for("login"))  # Redirect if authentication fails
-
-    try:
-        user_data = sp.current_user()  # ✅ This will now work!
-        
-        # Handle missing 'images' field
-        images = user_data.get('images', [])
-        profile_image = images[0]['url'] if images else url_for('static', filename='profile.png')
-
-        return render_template('dashboard.html', profile_image=profile_image)
-
-    except Exception as e:
-        print(f"Error fetching user data: {e}")
-        return "An error occurred while fetching user data.", 500
 
 
 @app.route('/playlist-to-personality')
