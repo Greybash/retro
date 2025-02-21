@@ -49,9 +49,26 @@ def get_spotify_auth():
 @app.route('/callback')
 def callback():
     code = request.args.get("code")
-    token_info = sp_oauth.get_access_token(code, as_dict=False)  # Updated method
-    session["token_info"] = token_info
-    return redirect(url_for("dashboard"))
+    
+    if not code:
+        return "Authorization failed: No code received.", 400  # Handle missing code
+
+    try:
+        token_info = sp_oauth.get_access_token(code)  # Get access token (returns a dictionary)
+
+        if not token_info or "access_token" not in token_info:
+            return "Error retrieving access token.", 400
+
+        session["token_info"] = token_info  # Store token info properly
+        session.permanent = True  # Ensures session persists (optional)
+
+        print("Stored Token Info:", session.get("token_info"))  # Debugging
+
+        return redirect(url_for("dashboard"))
+
+    except Exception as e:
+        print(f"Error in callback: {e}")
+        return "An error occurred during authentication.", 500
 
 
 @app.route('/')
