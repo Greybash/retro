@@ -22,8 +22,8 @@ app.config["SESSION_USE_SIGNER"] = True
 Session(app)  # Moved after app configuration
 
 sp_oauth = SpotifyOAuth(
-    client_id=os.getenv("CLIENT_ID"),
-    client_secret=os.getenv("CLIENT_SECRET"),
+    client_id='7221b06d7bdf448cbe1cd4eaf3e4d779',
+    client_secret='7ec66c2b674e4ba1a7dd79478f32f54c',
     redirect_uri="https://retro-production-7ee2.up.railway.app/callback",
     scope=os.getenv("SPOTIFY_SCOPE"),
 )
