@@ -7,14 +7,17 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 from config import Config  # Import Config class
-
+from flask import Flask, session
+from flask_session import Session
+import os
 
 
 load_dotenv()
 app = Flask(__name__)
 app.config.from_object(Config)  # Load configuration from config.py
-
 app.secret_key = "e3f1c2a5d5e1f2e4c9b6a4c8d3f0b7e6a8d5c3b9f4e2a1c7d6f0b8e5a4c2d3f1"
+app.config["SESSION_TYPE"] = "filesystem"  # Store session on the server
+Session(app)
 
 
 
