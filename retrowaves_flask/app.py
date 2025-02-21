@@ -29,17 +29,22 @@ sp_oauth = SpotifyOAuth(
 )
 
 def get_spotify_auth():
-    """Authenticate and return a Spotify client session for the current user."""
-    if "token_info" not in session:
-        return redirect("/login")
+    token_info = session.get("token_info")
     
-    token_info = session["token_info"]
+    print("Token Info:", token_info)  # Debugging line
+
+    if not token_info:
+        return None
+
+    if isinstance(token_info, str):  # Convert to dict if stored as a string
+        token_info = json.loads(token_info)
 
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
         session["token_info"] = token_info
 
-    return spotipy.Spotify(auth=token_info["access_token"])
+    return token_info
+
 
 @app.route('/callback')
 def callback():
