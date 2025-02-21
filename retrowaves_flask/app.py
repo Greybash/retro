@@ -28,16 +28,24 @@ sp_oauth = SpotifyOAuth(
 
 
 
+from flask import session, redirect, request
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
 def get_spotify_auth():
-    """Authenticate and return a Spotify client session."""
-    token_info = sp_oauth.get_cached_token()  # Check if a token exists
-    if not token_info:  # If no token, prompt for authorization
-        auth_url = sp_oauth.get_authorize_url()
-        return f"Please authorize: <a href='{auth_url}'>Login with Spotify</a>"
+    """Authenticate and return a Spotify client session for the current user."""
+    if "token_info" not in session:
+        return redirect("/login")  # Redirect to Spotify login if no token is found
     
-    access_token = token_info['access_token']
-    sp = spotipy.Spotify(auth=access_token)
-    return sp
+    token_info = session["token_info"]
+    
+    # Check if token is expired and refresh if needed
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+        session["token_info"] = token_info  # Update session with new token
+
+    return spotipy.Spotify(auth=token_info["access_token"])
+
 
 @app.route('/')
 def home():
