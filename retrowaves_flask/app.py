@@ -46,7 +46,7 @@ def home():
 def login():
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
-@app.route("/callback")
+
 @app.route('/callback')
 def callback():
     """Handle Spotify OAuth callback and generate a new token per user."""
