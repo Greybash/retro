@@ -57,17 +57,14 @@ def login():
     return redirect(auth_url)  # Redirect user to Spotify login
 
 
-@app.route("/callback")
+@app.route('/callback')
 def callback():
     code = request.args.get("code")
-    if not code:
-        return "Error: No authorization code received", 400
-
     token_info = sp_oauth.get_access_token(code)
     
-    # Save token in session
-    session["token_info"] = token_info
-    return redirect(url_for("dashboard"))  # Redirect to your main app page
+    session["token_info"] = token_info  # Store token in session
+    return redirect("/dashboard")  # Redirect to the dashboard
+  # Redirect to your main app page
 
 @app.route('/profile')
 def profile():
