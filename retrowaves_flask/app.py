@@ -26,16 +26,10 @@ sp_oauth = SpotifyOAuth(
 )
 
 def get_spotify_auth():
-    """Retrieve and refresh Spotify access token."""
-    token_info = session.get("token_info")
-    if not token_info:
-        return None
+    """Always get a new Spotify access token."""
+    auth_url = sp_oauth.get_authorize_url()
+    return redirect(auth_url)
 
-    if sp_oauth.is_token_expired(token_info):
-        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
-        session["token_info"] = token_info  # Update session with new token
-
-    return spotipy.Spotify(auth=token_info['access_token'])
 
 @app.route('/')
 def home():
@@ -45,15 +39,17 @@ def home():
 def login():
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
+@app.route("/callback")
+def spotify_callback():
+    """Handle Spotify OAuth callback and get new tokens."""
+    code = request.args.get("code")
+    if not code:
+        return "Error: Authorization code not provided."
 
-@app.route('/callback')
-def callback():
-    """Handle Spotify OAuth callback and store token info."""
-    session.clear()
-    code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
-    session['token_info'] = token_info
-    return redirect(url_for('dashboard'))
+    session["token_info"] = token_info  # Store new token in session
+    return redirect(url_for("home"))  # Redirect to your app's main page
+
 
 @app.route('/profile')
 def profile():
